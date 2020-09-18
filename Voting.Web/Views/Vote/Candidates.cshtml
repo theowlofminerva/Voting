@@ -1,0 +1,14 @@
+﻿
+@model System.Collections.Generic.List<Voting.Data.Models.Candidate>
+
+
+<html>
+
+<body>
+
+    @foreach (var candidate in Model)
+    {
+        <ul>@candidate.FirstName</ul>
+    }
+</body>
+</html>
