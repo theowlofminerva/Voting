@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Voting.Data.Models
 {
-    [Serializable]
-    public class Office
+    public partial class Office
     {
-        [Key]
-        [Required]
+        public Office()
+        {
+            CandidateOffices = new HashSet<CandidateOffice>();
+            Elections = new HashSet<Election>();
+        }
+
         public int Id { get; set; }
-
-
-        [Required]
-        public string Name { get; set; } = string.Empty;
-
-        public Candidate? CurrentOccupant { get; set; }
-
-        public DateTimeOffset? NextElectionDate { get; set; }
-
-        public OfficeType? OfficeType { get; set; }
-
+        public string Name { get; set; }
+        public string TermLimit { get; set; }
         public int? OfficeTypeId { get; set; }
+        public int? OfficeHolderId { get; set; }
+
+        public virtual Candidate OfficeHolder { get; set; }
+        public virtual OfficeType OfficeType { get; set; }
+        public virtual ICollection<CandidateOffice> CandidateOffices { get; set; }
+        public virtual ICollection<Election> Elections { get; set; }
     }
 }

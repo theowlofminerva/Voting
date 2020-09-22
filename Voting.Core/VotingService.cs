@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Voting.Data;
+using Voting.Data.Models;
 
 namespace Voting.Core
 {

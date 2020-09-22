@@ -1,46 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Voting.Data.Models
 {
-    [Serializable]
-    public class Candidate
+    public partial class Candidate
     {
-        [Key]
-        [Required]
+        public Candidate()
+        {
+            CandidateElections = new HashSet<CandidateElection>();
+            CandidateOffices = new HashSet<CandidateOffice>();
+            Elections = new HashSet<Election>();
+            Offices = new HashSet<Office>();
+            Votes = new HashSet<Vote>();
+        }
+
         public int Id { get; set; }
-
-        [Required]
-        public string FirstName { get; set; } = string.Empty;
-
-        [Required]
-        public string LastName { get; set; } = string.Empty;
-
-        [Required]
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public DateTimeOffset DateOfBirth { get; set; }
-
-        public bool? IsIncumbent { get; set; }
-
-        public string? Gender { get; set; }
-        public string? Ethnicity { get; set; }
-
-        ////
-
-        [Required]
+        public string Gender { get; set; }
+        public string Ethnicity { get; set; }
         public int PartyId { get; set; }
 
-
-        [Required]
-        public Party Party { get; set; } = new Party();
-
-        public IEnumerable<Vote>? Votes { get; set; }
-
-        public Office? Office { get; set; }
-
-        public int? OfficeId { get; set; }
-
+        public virtual Party Party { get; set; }
+        public virtual ICollection<CandidateElection> CandidateElections { get; set; }
+        public virtual ICollection<CandidateOffice> CandidateOffices { get; set; }
+        public virtual ICollection<Election> Elections { get; set; }
+        public virtual ICollection<Office> Offices { get; set; }
+        public virtual ICollection<Vote> Votes { get; set; }
     }
 }

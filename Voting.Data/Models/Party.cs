@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Voting.Data.Models
 {
-    [Serializable]
-    public class Party
+    public partial class Party
     {
-        [Key]
-        [Required]
+        public Party()
+        {
+            Candidates = new HashSet<Candidate>();
+            Voters = new HashSet<Voter>();
+        }
+
         public int Id { get; set; }
+        public string PartyName { get; set; }
 
-        [Required] 
-        public string PartyName { get; set; } = string.Empty;
-
-        ////
-        public IEnumerable<Candidate>? Candidates { get; set; }
-        public IEnumerable<Voter>? Voters { get; set; }
+        public virtual ICollection<Candidate> Candidates { get; set; }
+        public virtual ICollection<Voter> Voters { get; set; }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Voting.Data;
+using Voting.Data.Models;
 
 namespace Voting.Data.Migrations
 {
@@ -31,6 +31,7 @@ namespace Voting.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Address2")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PrecinctId")
@@ -47,7 +48,7 @@ namespace Voting.Data.Migrations
 
                     b.HasIndex("PrecinctId")
                         .IsUnique()
-                        .HasFilter("[PrecinctId] IS NOT NULL");
+                        .HasFilter("([PrecinctId] IS NOT NULL)");
 
                     b.HasIndex("VoterId")
                         .IsUnique();
@@ -94,10 +95,8 @@ namespace Voting.Data.Migrations
                     b.Property<DateTimeOffset>("DateOfBirth")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int?>("ElectionId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Ethnicity")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
@@ -105,32 +104,51 @@ namespace Voting.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsIncumbent")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OfficeId")
-                        .HasColumnType("int");
 
                     b.Property<int>("PartyId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ElectionId");
-
-                    b.HasIndex("OfficeId")
-                        .IsUnique()
-                        .HasFilter("[OfficeId] IS NOT NULL");
-
                     b.HasIndex("PartyId");
 
                     b.ToTable("Candidates");
+                });
+
+            modelBuilder.Entity("Voting.Data.Models.CandidateElection", b =>
+                {
+                    b.Property<int>("ElectionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CandidateId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ElectionId", "CandidateId");
+
+                    b.HasIndex("CandidateId");
+
+                    b.ToTable("CandidateElections");
+                });
+
+            modelBuilder.Entity("Voting.Data.Models.CandidateOffice", b =>
+                {
+                    b.Property<int>("CandidateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OfficeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CandidateId", "OfficeId");
+
+                    b.HasIndex("OfficeId");
+
+                    b.ToTable("CandidateOffices");
                 });
 
             modelBuilder.Entity("Voting.Data.Models.City", b =>
@@ -157,7 +175,7 @@ namespace Voting.Data.Migrations
 
                     b.HasIndex("AddressId")
                         .IsUnique()
-                        .HasFilter("[AddressId] IS NOT NULL");
+                        .HasFilter("([AddressId] IS NOT NULL)");
 
                     b.HasIndex("CountyId");
 
@@ -187,7 +205,7 @@ namespace Voting.Data.Migrations
 
                     b.HasIndex("AddressId")
                         .IsUnique()
-                        .HasFilter("[AddressId] IS NOT NULL");
+                        .HasFilter("([AddressId] IS NOT NULL)");
 
                     b.HasIndex("StateId");
 
@@ -204,10 +222,21 @@ namespace Voting.Data.Migrations
                     b.Property<DateTimeOffset>("ElectionDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int?>("TotalVotes")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OfficeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WinnerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OfficeId");
+
+                    b.HasIndex("WinnerId");
 
                     b.ToTable("Elections");
                 });
@@ -223,17 +252,21 @@ namespace Voting.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("NextElectionDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<int?>("OfficeHolderId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("OfficeTypeId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TermLimit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("OfficeTypeId")
-                        .IsUnique()
-                        .HasFilter("[OfficeTypeId] IS NOT NULL");
+                    b.HasIndex("OfficeHolderId");
+
+                    b.HasIndex("OfficeTypeId");
 
                     b.ToTable("Offices");
                 });
@@ -304,7 +337,7 @@ namespace Voting.Data.Migrations
 
                     b.HasIndex("AddressId")
                         .IsUnique()
-                        .HasFilter("[AddressId] IS NOT NULL");
+                        .HasFilter("([AddressId] IS NOT NULL)");
 
                     b.ToTable("States");
                 });
@@ -319,6 +352,9 @@ namespace Voting.Data.Migrations
                     b.Property<int?>("CandidateId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ElectionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("VoterId")
                         .HasColumnType("int");
 
@@ -326,8 +362,9 @@ namespace Voting.Data.Migrations
 
                     b.HasIndex("CandidateId");
 
-                    b.HasIndex("VoterId")
-                        .IsUnique();
+                    b.HasIndex("ElectionId");
+
+                    b.HasIndex("VoterId");
 
                     b.ToTable("Votes");
                 });
@@ -346,10 +383,8 @@ namespace Voting.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ElectionId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Ethnicity")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
@@ -357,6 +392,7 @@ namespace Voting.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
@@ -372,21 +408,37 @@ namespace Voting.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ElectionId");
-
                     b.HasIndex("PartyId");
 
                     b.ToTable("Voters");
                 });
 
+            modelBuilder.Entity("Voting.Data.Models.VoterElection", b =>
+                {
+                    b.Property<int>("ElectionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VoterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("ElectionId", "VoterId");
+
+                    b.HasIndex("VoterId");
+
+                    b.ToTable("VoterElections");
+                });
+
             modelBuilder.Entity("Voting.Data.Models.Address", b =>
                 {
                     b.HasOne("Voting.Data.Models.Precinct", "Precinct")
-                        .WithOne("Address")
+                        .WithOne("Addresses")
                         .HasForeignKey("Voting.Data.Models.Address", "PrecinctId");
 
                     b.HasOne("Voting.Data.Models.Voter", "Voter")
-                        .WithOne("Address")
+                        .WithOne("Addresses")
                         .HasForeignKey("Voting.Data.Models.Address", "VoterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -395,7 +447,7 @@ namespace Voting.Data.Migrations
             modelBuilder.Entity("Voting.Data.Models.BallotIssue", b =>
                 {
                     b.HasOne("Voting.Data.Models.Election", "Election")
-                        .WithMany()
+                        .WithMany("BallotIssues")
                         .HasForeignKey("ElectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -407,14 +459,6 @@ namespace Voting.Data.Migrations
 
             modelBuilder.Entity("Voting.Data.Models.Candidate", b =>
                 {
-                    b.HasOne("Voting.Data.Models.Election", null)
-                        .WithMany("Candidates")
-                        .HasForeignKey("ElectionId");
-
-                    b.HasOne("Voting.Data.Models.Office", "Office")
-                        .WithOne("CurrentOccupant")
-                        .HasForeignKey("Voting.Data.Models.Candidate", "OfficeId");
-
                     b.HasOne("Voting.Data.Models.Party", "Party")
                         .WithMany("Candidates")
                         .HasForeignKey("PartyId")
@@ -422,49 +466,97 @@ namespace Voting.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Voting.Data.Models.CandidateElection", b =>
+                {
+                    b.HasOne("Voting.Data.Models.Candidate", "Candidate")
+                        .WithMany("CandidateElections")
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voting.Data.Models.Election", "Election")
+                        .WithMany("CandidateElections")
+                        .HasForeignKey("ElectionId")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Voting.Data.Models.CandidateOffice", b =>
+                {
+                    b.HasOne("Voting.Data.Models.Candidate", "Candidate")
+                        .WithMany("CandidateOffices")
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voting.Data.Models.Office", "Office")
+                        .WithMany("CandidateOffices")
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Voting.Data.Models.City", b =>
                 {
                     b.HasOne("Voting.Data.Models.Address", "Address")
-                        .WithOne("City")
+                        .WithOne("Cities")
                         .HasForeignKey("Voting.Data.Models.City", "AddressId");
 
                     b.HasOne("Voting.Data.Models.County", "County")
                         .WithMany("Cities")
                         .HasForeignKey("CountyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Voting.Data.Models.State", "State")
                         .WithMany("Cities")
                         .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Voting.Data.Models.County", b =>
                 {
                     b.HasOne("Voting.Data.Models.Address", "Address")
-                        .WithOne("County")
+                        .WithOne("Counties")
                         .HasForeignKey("Voting.Data.Models.County", "AddressId");
 
                     b.HasOne("Voting.Data.Models.State", "State")
                         .WithMany("Counties")
                         .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Voting.Data.Models.Election", b =>
+                {
+                    b.HasOne("Voting.Data.Models.Office", "Office")
+                        .WithMany("Elections")
+                        .HasForeignKey("OfficeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voting.Data.Models.Candidate", "Winner")
+                        .WithMany("Elections")
+                        .HasForeignKey("WinnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Voting.Data.Models.Office", b =>
                 {
+                    b.HasOne("Voting.Data.Models.Candidate", "OfficeHolder")
+                        .WithMany("Offices")
+                        .HasForeignKey("OfficeHolderId")
+                        .HasConstraintName("FK_Offices_Candidates_CandidateId");
+
                     b.HasOne("Voting.Data.Models.OfficeType", "OfficeType")
-                        .WithOne("Office")
-                        .HasForeignKey("Voting.Data.Models.Office", "OfficeTypeId");
+                        .WithMany("Offices")
+                        .HasForeignKey("OfficeTypeId");
                 });
 
             modelBuilder.Entity("Voting.Data.Models.State", b =>
                 {
                     b.HasOne("Voting.Data.Models.Address", "Address")
-                        .WithOne("State")
+                        .WithOne("States")
                         .HasForeignKey("Voting.Data.Models.State", "AddressId");
                 });
 
@@ -474,23 +566,38 @@ namespace Voting.Data.Migrations
                         .WithMany("Votes")
                         .HasForeignKey("CandidateId");
 
-                    b.HasOne("Voting.Data.Models.Voter", "Voter")
-                        .WithOne("Vote")
-                        .HasForeignKey("Voting.Data.Models.Vote", "VoterId")
+                    b.HasOne("Voting.Data.Models.Election", "Election")
+                        .WithMany("Votes")
+                        .HasForeignKey("ElectionId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voting.Data.Models.Voter", "Voter")
+                        .WithMany("Votes")
+                        .HasForeignKey("VoterId")
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Voting.Data.Models.Voter", b =>
                 {
-                    b.HasOne("Voting.Data.Models.Election", "Election")
-                        .WithMany("Voters")
-                        .HasForeignKey("ElectionId");
-
                     b.HasOne("Voting.Data.Models.Party", "Party")
                         .WithMany("Voters")
                         .HasForeignKey("PartyId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Voting.Data.Models.VoterElection", b =>
+                {
+                    b.HasOne("Voting.Data.Models.Election", "Election")
+                        .WithMany("VoterElections")
+                        .HasForeignKey("ElectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voting.Data.Models.Voter", "Voter")
+                        .WithMany("VoterElections")
+                        .HasForeignKey("VoterId")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
